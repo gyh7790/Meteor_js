@@ -11,6 +11,12 @@
 </template>       
 
 <style lang="scss">
+    .layout {
+        height: 100%;
+    }
+    .el-container {
+        height: 100%;
+    }
     .el-header, .el-footer {
         background-color: #B3C0D1;
         color: #333;
@@ -28,8 +34,6 @@
         color: #333;
         text-align: center;
         line-height: 160px;
-    }
-    body > .el-container {
-        margin-bottom: 40px;
+        padding: 5px;
     }
 </style>

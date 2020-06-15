@@ -1,0 +1,21 @@
+
+
+* {
+    padding: 5px;
+}
+
+// 禁止用户选中 鼠标变为手形
+%unable-select {
+    user-select: none;
+    cursor: pointer;
+}
+
+// 填满父元素
+// 组要父元素 position: relative | absolute;
+%full {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
