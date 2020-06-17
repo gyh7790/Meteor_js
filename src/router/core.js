@@ -5,6 +5,6 @@ export default [
       meta: {
         title: 'Login'
       },
-      component: resolve => { require(['@/views/system/login/login.vue'], resolve) }
+      component: resolve => { require(['@/views/login/index.vue'], resolve) }
     }
 ]
