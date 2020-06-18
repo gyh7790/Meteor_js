@@ -4,6 +4,7 @@
 
       <div class="title-container">
         <h3 class="title">系统登入</h3>
+        <h5 style="color: red;text-align: center;">{{caution}}</h5>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +14,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="username"
           name="username"
           type="text"
           tabindex="1"
@@ -81,8 +82,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: 'sadmin',
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -93,24 +94,23 @@ export default {
       loading: false,
       showDialog: false,
       redirect: undefined,
+      caution: '',
       otherQuery: {}
     }
   },
+
   watch: {
     $route: {
       handler: function(route) {
         const query = route.query
         if (query) {
           this.redirect = query.redirect
-          this.otherQuery = this.getOtherQuery(query)
         }
       },
       immediate: true
     }
   },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
+
   mounted() {
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
@@ -118,9 +118,7 @@ export default {
       this.$refs.password.focus()
     }
   },
-  destroyed() {
-    // window.removeEventListener('storage', this.afterQRScan)
-  },
+
   methods: {
     // 验证密码
     checkCapslock(e) {
@@ -160,24 +158,16 @@ export default {
             } else {
               this.$message.error(res.msg);
             }
+            this.loading = false
           }).catch((res) => {
             this.$message.error(res.msg);
-            this.loading = true
+            this.loading = false
           })
-          this.loading = true
         } else {
           console.log('error submit!!')
           return false
         }
       })
-    },
-    getOtherQuery(query) {
-      return Object.keys(query).reduce((acc, cur) => {
-        if (cur !== 'redirect') {
-          acc[cur] = query[cur]
-        }
-        return acc
-      }, {})
     }
   }
 }

@@ -1,6 +1,6 @@
 export default {
     path: '/main',
-    name: 'mainRouter',
-    component: resolve => { require(['@/views/system/home/main.vue'], resolve) }
+    name: 'main',
+    component: resolve => { require(['@/layout/index.vue'], resolve) }
 }
   

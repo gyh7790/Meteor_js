@@ -3,7 +3,7 @@ import { Message } from 'element-ui'
 import Cookie from 'js-cookie'
 // import router from '@/router'
 
-axios.defaults.baseURL = 'http://127.0.0.1:8083'
+axios.defaults.baseURL = 'http://127.0.0.1:8088'
 // axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
