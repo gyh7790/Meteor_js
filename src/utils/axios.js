@@ -1,6 +1,7 @@
 import axios from 'axios'
+import store from '@/store'
 import { Message } from 'element-ui'
-import Cookie from 'js-cookie'
+import { getToken } from './auth'
 // import router from '@/router'
 
 axios.defaults.baseURL = 'http://127.0.0.1:8088'
@@ -22,10 +23,11 @@ axiosObj.defaults.transformRequest = (data) => {
 }
 
 axiosObj.interceptors.request.use(req => {
-  req.headers.token = Cookie.get('token')
+  if (store.getters.token) {
+    req.headers.token = getToken()
+  }
   return req
-},
-err => {
+},(err) => {
   return Promise.reject(err)
 })
 
@@ -49,5 +51,4 @@ axiosObj.interceptors.response.use(res => {
   return Promise.reject(error)
 })
 
-export let ajax = axiosObj
-export let cookie = Cookie
+export default axiosObj

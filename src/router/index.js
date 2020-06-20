@@ -1,16 +1,42 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import coreRouter from './core'
-import mainRouter from './mainRouter'
 
 Vue.use(VueRouter)
 
+import mainRouter from './mainRouter'
+
+export const constantRoutes = [
+  {
+    path: '/login',
+    name: 'login',
+    meta: {
+      title: 'Login'
+    },
+    component: resolve => { require(['@/views/login/index.vue'], resolve) }
+  }
+]
+
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
+const originalReplace = VueRouter.prototype.replace
+VueRouter.prototype.replace = function replace(location) {
+  return originalReplace.call(this, location).catch(err => err);
+};
+
 const router = new VueRouter({
-    routes: [
-        ...coreRouter,
-        mainRouter
-    ]
+  mode: 'history',
+  routes: [
+    ...constantRoutes,
+    mainRouter
+  ]
 })
+
+
+
+
 
 router.beforeEach((to, from, next) => {
     // ...
@@ -22,25 +48,5 @@ router.beforeEach((to, from, next) => {
       next()
     }
 })
-
-
-
-export const constantRoutes = [
-  {
-    path: '/404',
-    component: () => import('@/views/error-page/404'),
-  },
-  {
-    path: '/401',
-    component: () => import('@/views/error-page/401'),
-    hidden: true
-  }
-]
-
-export const asyncRoutes = [
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
-
 
 export default router

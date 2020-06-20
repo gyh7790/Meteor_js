@@ -20,6 +20,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { getRouter } from '@/api/navList'
 import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
@@ -49,6 +50,19 @@ export default {
     isCollapse() {
       return !this.sidebar.opened
     }
-  }
+  },
+  data() {
+    return {
+    }
+  },
+  mounted () {
+    if (Array.from(this.permission_routes).length <= 0 ) {
+      this.$ajax.get('sys/menu/getNav').then((res) => {
+        this.$store.dispatch('permission/setRoutes',getRouter(res.list));
+        this.$router.push({ path: res.list[0].href })
+      })
+    }
+  },
+
 }
 </script>

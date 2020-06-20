@@ -62,6 +62,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { getRouter } from '@/api/navList'
 
 export default {
   name: 'Login',
@@ -150,9 +151,10 @@ export default {
             }
           }).then((res) => {
             if (res.code === 200) {
-              this.$cookie.set('token', res.token, { expires: 10000 })
+              this.$store.dispatch('user/setToken', res.token)
+              this.$store.dispatch('permission/setRoutes',getRouter(res.navList))
               this.$message.success(res.msg)
-              this.$router.push({ path: '/main' })
+              this.$router.push({ path: res.navList[0].href })
             } else if (res.code === 201) {
               this.caution = '*  ' + res.msg
             } else {
@@ -164,7 +166,6 @@ export default {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
           return false
         }
       })
