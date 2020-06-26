@@ -3,7 +3,7 @@ export default [
     path: '/sys/menu',
     name: 'sysMenu',
     meta: {title: '菜单管理'},
-    component: () => import('@/views/system/menu.vue')
+    component: () => import('@/views/system/menu/index.vue')
   },
   {
     path: '/sys/user',
@@ -22,5 +22,11 @@ export default [
     name: 'sysDict',
     meta: {title: '字典管理'},
     component: () => import('@/views/system/dict.vue')
+  },
+  {
+    path: '/sys/selfInfo',
+    name: 'sysSelfInfo',
+    meta: {title: '个人中心'},
+    component: () => import('@/views/system/selfInfo.vue')
   }
 ]

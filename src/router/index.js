@@ -12,7 +12,15 @@ export const constantRoutes = [
     meta: {
       title: 'Login'
     },
-    component: resolve => { require(['@/views/login/index.vue'], resolve) }
+    component: () => import('@/views/login/index.vue')
+  },
+  {
+    path: '/register',
+    name: 'register',
+    meta: {
+      title: '注册'
+    },
+    component: () => import('@/views/login/register.vue')
   }
 ]
 

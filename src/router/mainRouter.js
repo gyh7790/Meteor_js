@@ -1,5 +1,6 @@
 import system from './modules/_system'
 import home from './modules/_index'
+import modular from './modules/_components'
 
 const mainRouter = {
     path: '/main',
@@ -7,6 +8,7 @@ const mainRouter = {
     component: resolve => { require(['@/layout/index.vue'], resolve) },
     children: [
         ...home,
+        ...modular,
         ...system
     ]
 }

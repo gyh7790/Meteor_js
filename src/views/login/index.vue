@@ -45,9 +45,12 @@
           </span>
         </el-form-item>
       </el-tooltip>
-
+      <div style="height:50px;line-height:33px;padding:0px 20px;">
+        <el-checkbox label="记住密码" style="float:left;" name="type"></el-checkbox>
+        <el-button type="text" class="col-lg-2" style="float:right;" @click="register">注册</el-button>
+      </div>
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登入</el-button>
-
+      
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -121,6 +124,10 @@ export default {
   },
 
   methods: {
+    // 注册
+    register(){
+      this.$router.push({ path: '/register' })
+    },
     // 验证密码
     checkCapslock(e) {
       const { key } = e
@@ -154,7 +161,7 @@ export default {
               this.$store.dispatch('user/setToken', res.token)
               this.$store.dispatch('permission/setRoutes',getRouter(res.navList))
               this.$message.success(res.msg)
-              this.$router.push({ path: res.navList[0].href })
+              this.$router.push({ path: '/home'})
             } else if (res.code === 201) {
               this.caution = '*  ' + res.msg
             } else {

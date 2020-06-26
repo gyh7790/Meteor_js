@@ -6,14 +6,17 @@ export function getRouter(routes) {
         let tmpNav = {}
         let meta = {}
         const tmp = { ...route }
-        tmpNav.path = tmp.href
+        tmpNav.path = tmp.target
         meta.title = tmp.name
         meta.icon = tmp.icon
         tmpNav.meta = meta
-        if (tmp.children) {
+        tmpNav.redirect = tmp.target
+        if (tmp.children && Array.from(tmp.children).length > 0) {
+            tmpNav.redirect = tmp.target+'/'+(tmp.children)[0].target
             tmpNav.children = getRouter(tmp.children)
         }
         res.push(tmpNav)
     })
+
     return res
 }

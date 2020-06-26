@@ -1,5 +1,5 @@
 <template>
-    <div>菜单管理</div>
+    <div>个人中心</div>
 </template>
 
 <script>
