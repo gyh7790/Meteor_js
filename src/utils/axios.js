@@ -7,6 +7,7 @@ import { getToken } from './auth'
 axios.defaults.baseURL = 'http://127.0.0.1:8088'
 // axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded'
 
 let axiosObj = axios.create({
   headers: {
@@ -18,7 +19,6 @@ let axiosObj = axios.create({
 })
 
 axiosObj.defaults.transformRequest = (data) => {
-
   return JSON.stringify(data)
 }
 

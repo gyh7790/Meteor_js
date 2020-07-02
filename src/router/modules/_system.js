@@ -6,6 +6,12 @@ export default [
     component: () => import('@/views/system/menu/index.vue')
   },
   {
+    path: '/sys/url',
+    name: 'sysUrl',
+    meta: {title: '接口管理'},
+    component: () => import('@/views/system/url/index.vue')
+  },
+  {
     path: '/sys/user',
     name: 'sysUser',
     meta: {title: '用户管理'},

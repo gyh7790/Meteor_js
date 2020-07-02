@@ -12,7 +12,7 @@
             <el-table-column prop="sort" label="顺序"/>
             <el-table-column label="URL" align="center" width="100" class-name="small-padding fixed-width">
               <template v-if="!row.children" slot-scope="{row}">
-                  <el-popover v-show="true" placement="left" border width="380" trigger="hover">
+                  <el-popover v-show="true" placement="left" border width="378" trigger="hover">
                     <el-table :data="row.urls" stripe border>
                       <el-table-column width="80" property="name" label="名称"></el-table-column>
                       <el-table-column width="190" property="url" label="url"></el-table-column>
@@ -71,7 +71,8 @@
           <div class="filter-container">
               <el-button type="primary" size="mini" @click="addMenuUrl()">新增</el-button>
           </div>
-          <el-table :data="urlData" style="width: 100%;" row-key="id" stripe border default-expand-all :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+          <el-table :data="urlData" style="width: 100%;" row-key="id" stripe border default-expand-all >
+            
             <el-table-column label="名称" width="100">
               <template slot-scope="{row}">
                 <el-input v-model="row.name" name="name" required>
@@ -90,7 +91,7 @@
             </el-table-column>
             <el-table-column label="操作" align="center" width="80" class-name="small-padding fixed-width">
               <template slot-scope="scope">
-                <el-button size="mini" type="danger" @click="urlData.splice(scope.$index,1)">
+                <el-button size="mini" type="danger" @click="daleteUrl(scope.row,scope.$index)">
                   删除
                 </el-button>
               </template>
@@ -188,6 +189,7 @@
         this.menuId = row.id;
         this.dialogURLVisible = true;
         this.urlData = [];
+        this.urlDeleteData = [];
         this.urlData = row.urls;
       },
       // 添加 url
@@ -200,11 +202,25 @@
       },
       // 删除 url
       daleteUrl(row,index){
-        this.urlData.splice(index,1);
+        if (row.id) {
+          this.$confirm('该数据已经存在数据库，是否删除', '提示', {
+            confirmButtonText: '删除',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+              this.$ajax.delete('sys/url/'+row.id).then((res) => {
+                if (res.code === 200) {
+                  this.urlData.splice(index,1);
+                }
+              })
+          }).catch(() => {});
+        } else {
+          this.urlData.splice(index,1);
+        }
       },
       // 保存 url
       saveMenuUrl() {
-        this.$ajax.post('sys/url/addUrl',this.urlData).then((res) => {
+        this.$ajax.post('sys/url/add',this.urlData).then((res) => {
             this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
             if (res.code === 200) {
                 this.dialogURLVisible = false;
