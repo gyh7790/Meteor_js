@@ -8,7 +8,12 @@
         <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
             <el-table-column prop="name" label="名称" width="250"/>
             <el-table-column prop="target" label="目标"/>
-            <el-table-column prop="icon" label="图标"/>
+            <el-table-column prop="icon" label="图标">
+              <template slot-scope="{row}">
+                <i v-if="row.icon && row.icon.includes('el-icon')" :class="row.icon"/>
+                <svg-icon v-else :icon-class="row.icon" />
+              </template>
+            </el-table-column>
             <el-table-column prop="sort" label="顺序"/>
             <el-table-column label="URL" align="center" width="100" class-name="small-padding fixed-width">
               <template v-if="!row.children" slot-scope="{row}">
@@ -54,7 +59,17 @@
                     <el-input v-model="manuData.target"></el-input>
                 </el-form-item>
                 <el-form-item label="菜单图标" prop="icon">
-                    <el-input v-model="manuData.icon"></el-input>
+                  <el-popover v-show="true"
+                    placement="bottom"
+                    width="400"
+                    trigger="click" 
+                    @show="$refs['iconSelect'].reset()">
+                    <IconSelect ref="iconSelect" @selected="selected" />
+                    <el-input slot="reference" v-model="manuData.icon" name='icon' readonly>
+                      <i slot="prefix" v-if="manuData.icon && manuData.icon.includes('el-icon')" :class="manuData.icon"/>
+                      <svg-icon slot="prefix" v-else :icon-class="manuData.icon" />
+                    </el-input>
+                  </el-popover>
                 </el-form-item>
                 <el-form-item label="菜单顺序" prop="sort">
                     <el-input type="number" min='1' v-model="manuData.sort"/>
@@ -105,130 +120,138 @@
     </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        manuData:{
-            parentName: '',
-            name: '',
-            parentId: '1',
-            target: '',
-            icon: '',
-            sort: 1
-        },
-        manuRules: {
-            name: [{ required: true, trigger: 'blur'}],
-            icon: [{ required: true, trigger: 'blur'}],
-            target: [{ required: true, trigger: 'blur'}],
-            sort: [{ required: true, trigger: 'blur'}]
-        },
-        tableData: [],
-        urlData: [],
-        menuId: '',
-        dialogTitle: '',
-        target: 'add',
-        dialogFormVisible: false,
-        dialogURLVisible: false
+import IconSelect from "@/components/IconSelect";
+
+export default {
+  components: { IconSelect },
+  data() {
+    return {
+      manuData:{
+          parentName: '',
+          name: '',
+          parentId: '1',
+          target: '',
+          icon: '',
+          sort: 1
+      },
+      manuRules: {
+          name: [{ required: true, trigger: 'blur'}],
+          target: [{ required: true, trigger: 'blur'}],
+          sort: [{ required: true, trigger: 'blur'}]
+      },
+      tableData: [],
+      urlData: [],
+      menuId: '',
+      dialogTitle: '',
+      target: 'add',
+      dialogFormVisible: false,
+      dialogURLVisible: false
+    }
+  },
+  created() {
+      this.getMenuList()
+  },
+  methods: {
+    selected(name) {
+      this.manuData.icon = name;
+    },
+    // 获取 菜单
+    getMenuList(){
+      this.$ajax.get('sys/menu/getNavUrl').then((res) => {
+          if (res.code === 200) {
+              this.tableData = res.list
+          }
+      })
+    },
+    // 新增 菜单
+    addMenu(row){
+      this.manuData = {icon: ''}
+      this.target = 'add';
+      this.dialogTitle = '新增';
+      this.manuData.parentName = row.name;
+      this.manuData.parentId = row.id;
+      this.dialogFormVisible = true;
+    },
+    // 点击 编辑菜单
+    updateMenu(row){
+      this.manuData = {}
+      this.target = 'update';
+      this.dialogTitle = '修改';
+      this.manuData = row;
+      if (this.manuData.icon == undefined) {
+        this.$set( this.manuData, 'icon', '' )
+      }
+      this.dialogFormVisible = true;
+    },
+    // 新增 菜单
+    saveMenu(){
+      this.$ajax.post('sys/menu/'+this.target,this.manuData).then((res) => {
+          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          if (res.code === 200) {
+              this.dialogFormVisible = false;
+              this.getMenuList();
+          }
+      })
+    },
+    // 删除 菜单
+    dalete(id){
+      this.$confirm('删除菜单, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+          this.$ajax.delete('sys/menu/'+id).then((res) => {
+              this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+              if (res.code === 200) this.getMenuList();
+          })
+      }).catch(() => {});
+    },
+    // 管理 URL
+    urlManage(row){
+      this.menuId = '';
+      this.menuId = row.id;
+      this.dialogURLVisible = true;
+      this.urlData = [];
+      this.urlDeleteData = [];
+      this.urlData = row.urls;
+    },
+    // 添加 url
+    addMenuUrl(){
+      if (this.urlData == undefined) {
+        this.urlData = [{menuId:this.menuId,auth: 1}];
+      } else {
+        this.urlData.push({menuId:this.menuId,auth: 1});
       }
     },
-    created() {
-        this.getMenuList()
-    },
-    methods: {
-      // 获取 菜单
-      getMenuList(){
-        this.$ajax.get('sys/menu/getNavUrl').then((res) => {
-            if (res.code === 200) {
-                this.tableData = res.list
-            }
-        })
-      },
-      // 新增 菜单
-      addMenu(row){
-        this.manuData = {}
-        this.target = 'add';
-        this.dialogTitle = '新增';
-        this.manuData.parentName = row.name;
-        this.manuData.parentId = row.id;
-        this.dialogFormVisible = true;
-      },
-      // 点击 编辑菜单
-      updateMenu(row){
-        this.manuData = {}
-        this.target = 'update';
-        this.dialogTitle = '修改';
-        this.manuData = row;
-        this.dialogFormVisible = true;
-      },
-      // 新增 菜单
-      saveMenu(){
-        this.$ajax.post('sys/menu/'+this.target,this.manuData).then((res) => {
-            this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-            if (res.code === 200) {
-                this.dialogFormVisible = false;
-                this.getMenuList();
-            }
-        })
-      },
-      // 删除 菜单
-      dalete(id){
-        this.$confirm('删除菜单, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+    // 删除 url
+    daleteUrl(row,index){
+      if (row.id) {
+        this.$confirm('该数据已经存在数据库，是否删除', '提示', {
+          confirmButtonText: '删除',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-            this.$ajax.delete('sys/menu/'+id).then((res) => {
-                this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-                if (res.code === 200) this.getMenuList();
+            this.$ajax.delete('sys/url/'+row.id).then((res) => {
+              if (res.code === 200) {
+                this.urlData.splice(index,1);
+              }
             })
         }).catch(() => {});
-      },
-      // 管理 URL
-      urlManage(row){
-        this.menuId = '';
-        this.menuId = row.id;
-        this.dialogURLVisible = true;
-        this.urlData = [];
-        this.urlDeleteData = [];
-        this.urlData = row.urls;
-      },
-      // 添加 url
-      addMenuUrl(){
-        if (this.urlData == undefined) {
-          this.urlData = [{menuId:this.menuId,auth: 1}];
-        } else {
-          this.urlData.push({menuId:this.menuId,auth: 1});
-        }
-      },
-      // 删除 url
-      daleteUrl(row,index){
-        if (row.id) {
-          this.$confirm('该数据已经存在数据库，是否删除', '提示', {
-            confirmButtonText: '删除',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-              this.$ajax.delete('sys/url/'+row.id).then((res) => {
-                if (res.code === 200) {
-                  this.urlData.splice(index,1);
-                }
-              })
-          }).catch(() => {});
-        } else {
-          this.urlData.splice(index,1);
-        }
-      },
-      // 保存 url
-      saveMenuUrl() {
-        this.$ajax.post('sys/url/add',this.urlData).then((res) => {
-            this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-            if (res.code === 200) {
-                this.dialogURLVisible = false;
-                this.getMenuList();
-            }
-        });
+      } else {
+        this.urlData.splice(index,1);
       }
-
+    },
+    // 保存 url
+    saveMenuUrl() {
+      this.$ajax.post('sys/url/add',this.urlData).then((res) => {
+          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          if (res.code === 200) {
+              this.dialogURLVisible = false;
+              this.getMenuList();
+          }
+      });
     }
+
   }
+}
 </script>

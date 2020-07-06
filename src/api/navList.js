@@ -2,6 +2,8 @@
 export function getRouter(routes) {
     const res = []
 
+    if (routes == null) return res
+
     routes.forEach(route => {
         let tmpNav = {}
         let meta = {}

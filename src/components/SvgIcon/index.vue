@@ -13,6 +13,7 @@ export default {
   name: 'SvgIcon',
   props: {
     iconClass: {
+      default: '',
       type: String,
       required: true
     },

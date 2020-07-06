@@ -27,7 +27,13 @@ export default [
     path: '/sys/dict',
     name: 'sysDict',
     meta: {title: '字典管理'},
-    component: () => import('@/views/system/dict.vue')
+    component: () => import('@/views/system/dict/index.vue')
+  },
+  {
+    path: '/sys/dict/type/:id',
+    name: 'sysDictData',
+    meta: {title: '字典数据'},
+    component: () => import('@/views/system/dict/data.vue')
   },
   {
     path: '/sys/selfInfo',
