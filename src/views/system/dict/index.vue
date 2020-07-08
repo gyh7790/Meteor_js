@@ -1,18 +1,18 @@
 <template>
     <div class="app-container">
       <div class="filter-container">
-        <el-button type="primary" size="mini" >新增</el-button>
+        <el-button type="primary" size="mini" @click="addDictDictType">新增</el-button>
       </div>
       
       <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all >
-        <el-table-column label="字典编号" align="center" prop="id" />
+        <el-table-column type="index" width="50" label="编号" align="center"></el-table-column>
         <el-table-column label="字典名称" align="center" prop="name" :show-overflow-tooltip="true" />
         <el-table-column label="字典类型" align="center" :show-overflow-tooltip="true">
-            <template slot-scope="scope">
+          <template slot-scope="scope">
             <router-link :to="{ path: '/sys/dict/type/'+scope.row.id, query: { type: scope.row.type}}" class="link-type">
                 <span>{{ scope.row.type }}</span>
             </router-link>
-            </template>
+          </template>
         </el-table-column>
         <el-table-column label="备注" align="center" prop="remarks" :show-overflow-tooltip="true" />
         <el-table-column label="创建时间" align="center" prop="createDate" width="180">
@@ -21,27 +21,37 @@
             </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-            <template slot-scope="{row}">
-              <el-button v-if="row.auth == 1" size="mini" type="success">
-                配置权限
+            <template slot-scope="{row,$index}">
+              <el-button size="mini" @click="updateDictType(row)" type="warning">
+                编辑
               </el-button>
-              <el-button size="mini" @click="updateUrl(row)" type="warning">
-                  编辑
-              </el-button>
-              <el-button size="mini" @click="deleteUrl(row)" type="danger">
-                  删除
+              <el-button size="mini" @click="deleteDictType(row,$index)" type="danger">
+                删除
               </el-button>
             </template>
         </el-table-column>
       </el-table>
 
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="pageNo"
-      :limit.sync="pageSize"
-    />
+    <pagination v-show="total>0" :total="total" :page.sync="pageNo" :limit.sync="pageSize" @pagination="getDictTypeList"/>
 
+    <!-- 添加或修改参数配置对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="500px" close-on-click-modal="true" append-to-body>
+      <el-form ref="dictTypeForm" :model="dictTypeForm" :rules="dictTypeRules" label-width="80px">
+        <el-form-item label="数据标签" prop="name">
+          <el-input v-model="dictTypeForm.name" placeholder="请输入数据标签" />
+        </el-form-item>
+        <el-form-item label="数据键值" prop="type">
+          <el-input v-model="dictTypeForm.type" placeholder="请输入数据键值" />
+        </el-form-item>
+        <el-form-item label="备注" prop="remarks">
+          <el-input v-model="dictTypeForm.remarks" type="textarea" placeholder="请输入内容"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="submitForm()">确 定</el-button>
+      </div>
+    </el-dialog>
     </div>
 </template>
 
@@ -57,20 +67,65 @@ import Pagination from '@/components/Pagination'
         tableData: [],
         urlData: {},
         urlRules: {},
-        dialogURLVisible: false
+        dialogURLVisible: false,
+        open: false,
+        dictTypeForm: {},
+        dictTypeRules: {
+          name: [{ required: true, message: "数据标签不能为空", trigger: "blur" }],
+          type: [{ required: true, message: "数据键值不能为空", trigger: "blur" }]
+        },
+        title: '',
       }
     },
     created() {
-        this.getList();
+        this.getDictTypeList();
     },
     methods: {
-      getList(){
-        this.$ajax.get('sys/dictType/page').then((res) => {
+      getDictTypeList(){
+        let params = {pageNo: this.pageNo,pageSize: this.pageSize}
+        this.$ajax.get('sys/dictType/page',{params}).then((res) => {
           if (res.code === 200) {
               this.total = res.page.total;
               this.tableData = res.page.list
           }
         })
+      },
+      cancel(){
+        this.open = false;
+        this.dictTypeForm = {
+          name: undefined,
+          type: undefined,
+          remarks: undefined
+        }
+      },
+      addDictDictType(){
+        this.open = true;
+        this.title = '添加字典类型';
+      },
+      updateDictType(row){
+        this.open = true;
+        this.title = '修改字典类型';
+        this.dictTypeForm = {
+          id: row.id,
+          name: row.name,
+          type: row.type,
+          remarks: row.remarks
+        };
+      },
+      submitForm(){
+        this.$ajax.post('sys/dictType/save',this.dictTypeForm).then(res => {
+          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          if (res.code === 200) {
+            this.getDictTypeList();
+            this.cancel();
+          }
+        });
+      },
+      deleteDictType(row,index){
+        this.$ajax.delete('sys/dictType/'+row.id).then(res => {
+          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          if (res.code === 200) this.tableData.splice(index,1);
+        });
       }
     }
   }

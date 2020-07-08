@@ -26,6 +26,9 @@ axiosObj.interceptors.request.use(req => {
   if (store.getters.token) {
     req.headers.token = getToken()
   }
+  if ('get' == req.method) {
+    console.log(req)
+  }
   return req
 },(err) => {
   return Promise.reject(err)
@@ -50,5 +53,10 @@ axiosObj.interceptors.response.use(res => {
   }
   return Promise.reject(error)
 })
+
+axiosObj.get((url,params)=>{
+console.log(url);
+console.log(params);
+});
 
 export default axiosObj

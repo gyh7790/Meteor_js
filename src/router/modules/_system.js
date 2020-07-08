@@ -21,7 +21,7 @@ export default [
     path: '/sys/role',
     name: 'sysRole',
     meta: {title: '角色管理'},
-    component: () => import('@/views/system/role.vue')
+    component: () => import('@/views/system/role/index')
   },
   {
     path: '/sys/dict',

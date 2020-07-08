@@ -12,7 +12,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-search" size="mini" @click="getDictDataList(queryParams.dictType)">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="getRoleList">搜索</el-button>
                 <el-button icon="el-icon-refresh" size="mini" @click="resetForm('queryParams')">重置</el-button>
             </el-form-item>
         </el-form>
@@ -23,16 +23,16 @@
     </div>
       
     <el-table :data="tableData" stripe border default-expand-all style="width: 100%">
-        <el-table-column type="selection" width="55" align="center" />
-        <el-table-column prop="value" label="值" align="center"/>
-        <el-table-column prop="label" label="标签" align="center"/>
-        <el-table-column prop="sort" label="排序" align="center"/>
-        <el-table-column prop="defaults" label="默认值" align="center">
-          <template slot-scope="{row}">
-            <el-switch v-model.number="row.defaults" @change="changeSwith(row)" :value="row.defaults" :active-value=1 :inactive-value=0 />
-          </template>
+        <el-table-column type="index" width="50" label="编号" align="center"/>
+        <el-table-column prop="enname" label="code" align="center"/>
+        <el-table-column prop="name" label="名称" align="center"/>
+        <el-table-column prop="type" label="类型" align="center"/>
+        <el-table-column prop="dataScope" label="数据范围" align="center"/>
+        <el-table-column prop="useable" label="是否可用" align="center">
+            <template slot-scope="{row}">
+                <el-switch v-model.number="row.useable" :value="row.useable" :active-value=1 :inactive-value=0 />
+            </template>
         </el-table-column>
-
         <el-table-column  prop="remarks" label="备注" align="center" :show-overflow-tooltip="true" />
         <el-table-column label="创建时间" align="center" prop="createDate" width="180">
             <template slot-scope="scope">
@@ -53,7 +53,7 @@
 
 
     <!-- 添加或修改参数配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <!-- <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="dataForm" :model="dataForm" :rules="dataForm" label-width="80px">
         <el-form-item label="字典类型">
           <el-input v-model="dataForm.dictType" :disabled="true" />
@@ -75,7 +75,7 @@
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="submitForm()">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
   </div>
 </template>
@@ -106,78 +106,16 @@
       }
     },
     created() {
-      this.getDictTypeList();
-      this.getDictDataList(this.$route.query.type);
+      this.getRoleList();
     },
     methods: {
-      getDictTypeList(){
-        this.$ajax.get('sys/dictType/list').then((res) => {
+      getRoleList(){
+        this.$ajax.get('sys/role/page').then((res) => {
           if (res.code === 200) {
-            this.typeOptions = res.list
+              this.tableData = res.page.list
+            console.log(this.tableData)
           }
         })
-      },
-      getDictDataList(dictType){ // sys/dictData
-        this.$ajax.get('sys/dictData/'+dictType).then((res) => {
-          if (res.code === 200) {
-            this.tableData = res.list
-            this.defaultDictType = dictType;
-          }
-        })
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
-      },
-      cancel(){
-        this.open = false;
-        this.dataForm = {
-          label: undefined,
-          value: undefined,
-          sort: 0,
-          defaults: 0,
-          remarks: undefined
-        }
-      },
-      addDictData(){
-        this.open = true;
-        this.title = '添加数据';
-        this.dataForm = {
-          dictType: this.defaultDictType,
-          label: undefined,
-          value: undefined,
-          sort: 0,
-          defaults: 0,
-          remarks: undefined
-        };
-      },
-      updateDictData(row){
-        this.open = true;
-        this.dataForm = row;
-        this.title = '修改数据';
-        if (!row.dictType) {
-          this.dataForm.dictType = this.defaultDictType
-        }
-      },
-      changeSwith(row){
-        this.$ajax.put('sys/dictData/default', row ).then(res => {
-          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-          if (res.code === 200) this.getDictDataList(this.defaultDictType);
-        });
-      },
-      submitForm() {
-        this.$ajax.post('sys/dictData/save', this.dataForm).then(res => {
-          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-          if (res.code === 200) {
-            this.getDictDataList(this.defaultDictType);
-            this.cancel();
-          }
-        });
-      },
-      deleteDictData(row,index){
-        this.$ajax.delete('sys/dictData/'+row.id).then(res => {
-          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
-          if (res.code === 200) this.tableData.splice(index,1);
-        });
       }
     }
   }

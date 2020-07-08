@@ -1,45 +1,63 @@
 <template>
-  <div>
-    {{dictType}}
-    <el-select v-model="value" filterable placeholder="请选择">
-    <el-option
-      v-for="item in options"
+    <el-select v-model="value" @change="handleSelectChange" filterable placeholder="请选择">
+      <el-option
+      v-for="item in dictDatas"
       :key="item.value"
       :label="item.label"
       :value="item.value">
+      <span style="float: left">{{ item.label }}</span>
+      <span v-if="isValue" style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
     </el-option>
   </el-select>
-  </div>
 </template>
 
 <script>
   export default {
     name: 'DictItem',
     props: {
+      dictData: {
+        type: Array
+      },
       dictType: {
         type: String,
         required: true
+      },
+      isValue: {
+        type: Boolean,
+        default: false
       }
     },
+    // computed: {
+    //   dictDatas: {
+    //     get() {
+    //       return this.dictData
+    //     },
+    //     set(val) {
+    //       this.$emit('update:dictData', val)
+    //     }
+    //   }
+    // },
     data() {
       return {
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }, {
-          value: '选项2',
-          label: '双皮奶'
-        }, {
-          value: '选项3',
-          label: '蚵仔煎'
-        }, {
-          value: '选项4',
-          label: '龙须面'
-        }, {
-          value: '选项5',
-          label: '北京烤鸭'
-        }],
+        dictDatas: this.dictData,
         value: ''
+      }
+    },
+    created() {
+      if (!this.dictDatas) {
+        this.getDictList();
+      }
+    },
+    methods: {
+      getDictList() {
+        this.$ajax.get('sys/dictData/'+this.dictType).then((res) => {
+          if (res.code === 200) {
+            this.dictDatas = res.list;
+          }
+        })
+      },
+      handleSelectChange(val) {
+        this.$emit('select', val)
       }
     }
   }

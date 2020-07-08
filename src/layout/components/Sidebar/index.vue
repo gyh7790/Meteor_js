@@ -59,8 +59,8 @@ export default {
     if (Array.from(this.permission_routes).length <= 0 ) {
       this.$ajax.get('sys/menu/getNav').then((res) => {
         this.$store.dispatch('permission/setRoutes',getRouter(res.list));
-        this.$router.push({ path: '/home' })
-        this.$store.dispatch('tagsView/delAllViews')
+        // this.$router.push({ path: '/home' })
+        // this.$store.dispatch('tagsView/delAllViews')
       })
     }
   },
