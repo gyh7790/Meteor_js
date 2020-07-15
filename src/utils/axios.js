@@ -4,7 +4,7 @@ import { Message } from 'element-ui'
 import { getToken } from './auth'
 // import router from '@/router'
 
-axios.defaults.baseURL = 'http://127.0.0.1:8088'
+axios.defaults.baseURL = 'http://140.143.14.231:8090'
 // axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -26,9 +26,6 @@ axiosObj.interceptors.request.use(req => {
   if (store.getters.token) {
     req.headers.token = getToken()
   }
-  if ('get' == req.method) {
-    console.log(req)
-  }
   return req
 },(err) => {
   return Promise.reject(err)
@@ -46,17 +43,12 @@ axiosObj.interceptors.response.use(res => {
     return Promise.reject(res.data)
   }
 }, (error) => {
-  if (error.response.status === 403) {
+  if (error.response != undefined && error.response.status === 403) {
     Message.error(error.response.data.msg)
   } else {
     Message.error('未知异常')
   }
   return Promise.reject(error)
 })
-
-axiosObj.get((url,params)=>{
-console.log(url);
-console.log(params);
-});
 
 export default axiosObj

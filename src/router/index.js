@@ -35,7 +35,6 @@ VueRouter.prototype.replace = function replace(location) {
 };
 
 const router = new VueRouter({
-  mode: 'history',
   routes: [
     ...constantRoutes,
     mainRouter
@@ -49,9 +48,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     // ...
     if (to.path === '/') {
-      next({
-        path: 'login'
-      })
+      next({ path: 'login' })
     } else {
       next()
     }
