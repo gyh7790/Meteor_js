@@ -4,10 +4,10 @@ import { Message } from 'element-ui'
 import { getToken } from './auth'
 // import router from '@/router'
 
-axios.defaults.baseURL=process.env.VUE_APP_URL
+axios.defaults.baseURL='http://localhost:8090'
 // axios.defaults.withCredentials = true
-axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
-// axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded'
 
 let axiosObj = axios.create({
   headers: {
@@ -51,14 +51,24 @@ axiosObj.interceptors.response.use(res => {
   return Promise.reject(error)
 })
 
-const getParam = function(url, params){
-  return axiosObj.request({
-    method: 'GET',
-    url: url,
-    params: params
-  });
+function apiAxios (method, url, params, success, failure) {
+
 }
 
-axiosObj.get = getParam
 
-export default axiosObj
+// 返回在vue模板中的调用接口
+export default {
+  get: function (url, params, success, failure) {
+    return apiAxios('GET', url, params, success, failure)
+  },
+  post: function (url, params, success, failure) {
+    return apiAxios('POST', url, params, success, failure)
+  },
+  put: function (url, params, success, failure) {
+    return apiAxios('PUT', url, params, success, failure)
+  },
+  delete: function (url, params, success, failure) {
+    return apiAxios('DELETE', url, params, success, failure)
+  }
+}
+

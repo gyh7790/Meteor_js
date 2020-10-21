@@ -15,7 +15,7 @@ export default [
     path: '/sys/user',
     name: 'sysUser',
     meta: {title: '用户管理'},
-    component: () => import('@/views/system/user.vue')
+    component: () => import('@/views/system/user/index.vue')
   },
   {
     path: '/sys/role',

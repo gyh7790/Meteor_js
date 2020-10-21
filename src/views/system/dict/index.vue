@@ -1,6 +1,17 @@
 <template>
     <div class="app-container">
       <div class="filter-container">
+        <el-form :model="params" ref="params" :inline="true">
+            <el-form-item label="字典名称" prop="dictType">
+              <el-input v-model="params.keyWord" placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="getDictTypeList">搜索</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+
+      <div class="filter-container">
         <el-button type="primary" size="mini" @click="addDictDictType">新增</el-button>
       </div>
       
@@ -32,10 +43,10 @@
         </el-table-column>
       </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="pageNo" :limit.sync="pageSize" @pagination="getDictTypeList"/>
+    <pagination v-show="total>0" :total="total" :page.sync="params.pageNo" :limit.sync="params.pageSize" @pagination="getDictTypeList"/>
 
     <!-- 添加或修改参数配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" close-on-click-modal="true" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal='true' append-to-body>
       <el-form ref="dictTypeForm" :model="dictTypeForm" :rules="dictTypeRules" label-width="80px">
         <el-form-item label="数据标签" prop="name">
           <el-input v-model="dictTypeForm.name" placeholder="请输入数据标签" />
@@ -61,8 +72,11 @@ import Pagination from '@/components/Pagination'
     components: { Pagination },
     data() {
       return {
-        pageNo: 1,
-        pageSize: 10,
+        params: {
+          keyWord:'',
+          pageNo: 1,
+          pageSize: 10,
+        },
         total: 0,
         tableData: [],
         urlData: {},
@@ -82,8 +96,7 @@ import Pagination from '@/components/Pagination'
     },
     methods: {
       getDictTypeList(){
-        let params = {pageNo: this.pageNo,pageSize: this.pageSize}
-        this.$ajax.get('sys/dictType/page',{params}).then((res) => {
+        this.$ajax.get('sys/dictType/page',this.params).then((res) => {
           if (res.code === 200) {
               this.total = res.page.total;
               this.tableData = res.page.list

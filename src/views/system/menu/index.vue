@@ -47,8 +47,8 @@
         </el-table>
 
         <!-- 修改或新增 菜单  -->
-        <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
-            <el-form :model="manuData" :rules="manuRules" ref="manuData" label-position="left" label-width="80px" style="width: 400px; margin-left:70px;">
+        <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible" width="500px">
+            <el-form :model="manuData" :rules="manuRules" ref="manuData" label-position="left" label-width="80px" style="width: 400px; margin-left:50px;">
                 <el-form-item v-if="manuData.parentName" label="父级菜单" prop="parentName">
                     <el-input v-model="manuData.parentName" :disabled="true"></el-input>
                 </el-form-item>
