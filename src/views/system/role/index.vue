@@ -37,6 +37,9 @@
               <el-button size="mini" @click="dialogFormVisible=true;dataForm=row" type="warning">
                   编辑
               </el-button>
+              <el-button size="mini" @click="getMenuByRole(row.id)" type="warning">
+                  分配权限
+              </el-button>
               <el-button size="mini" @click="deleteRole(row,$index)" type="danger">
                   删除
               </el-button>
@@ -69,14 +72,29 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false; dataForm={}">取 消</el-button>
-        <el-button type="primary" @click="submitForm()">确 定</el-button>
+        <el-button type="primary" @click="submitForm">确 定</el-button>
       </div>
     </el-dialog>
 
+    <el-dialog title="菜单权限" :visible.sync="menuVisible" width="350px">
+       <el-tree
+            :data="menuOptions"
+            show-checkbox
+            ref="menu"
+            node-key="id"
+            empty-text="加载中，请稍后"
+            :props="defaultProps"/>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="menuVisible = false;">取 消</el-button>
+        <el-button type="primary" @click="submitMenu">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { getMenu,getMenuIdByRoleId } from "@/api/system/menu";
+import { setEmpower } from "@/api/system/role";
   export default {
     data() {
       return {
@@ -90,14 +108,24 @@
         defaultDictType: this.$route.query.type,
         // 弹出层标题
         title: "",
+        // 菜单
+        menuOptions: [],
+        // 
+        roleId: '',
         // 是否显示弹出层
         dialogFormVisible: false,
+        // 菜单弹出层
+        menuVisible: false,
         // 修改 内容
         dataForm:{},
          // 表单校验
         dataRules: {
           label: [{ required: true, message: "数据标签不能为空", trigger: "blur" }],
           value: [{ required: true, message: "数据键值不能为空", trigger: "blur" }]
+        },
+        defaultProps: {
+          children: "children",
+          label: "name"
         }
       }
     },
@@ -112,7 +140,26 @@
           }
         })
       },
-
+      getMenuByRole(roleId){
+        this.roleId = roleId;
+        this.menuVisible = true;
+        getMenu().then((res) => {
+          if (res.code == 200) {
+            this.menuOptions = res.data
+            this.$refs.menu.setCheckedKeys([]);
+            getMenuIdByRoleId({roleId:roleId}).then((res)=>{
+              if (res.code == 200 && res.data) {
+                res.data.forEach(e => {
+                  var node = this.$refs.menu.getNode(e);
+                  if(node && node.isLeaf){
+                    this.$refs.menu.setChecked(node, true);
+                  }
+                });
+              }
+            });
+          }
+        });
+      },
       // fron 表单数据提交
       submitForm(){
         this.$ajax.post('sys/role/save',this.dataForm).then((res)=>{
@@ -123,6 +170,23 @@
           if (res.code === 200) {
             this.dialogFormVisible = false;
             this.getRoleList();
+          }
+        });
+      },
+      submitMenu(){
+        // 目前被选中的菜单节点
+      let checkedKeys = this.$refs.menu.getHalfCheckedKeys();
+      // 半选中的菜单节点
+      let halfCheckedKeys = this.$refs.menu.getCheckedKeys();
+      console.log(this.roleId)
+      console.log([...checkedKeys,...halfCheckedKeys]);
+        setEmpower({id:this.roleId,menuIds:[...checkedKeys,...halfCheckedKeys]}).then((res)=>{
+           this.$message({
+            message: res.msg,
+            type: res.code === 200 ? 'success' : 'error'
+          })
+          if (res.code === 200) {
+            this.menuVisible = false;
           }
         });
       },

@@ -34,39 +34,116 @@
 
       <!-- 菜单 的URL管理 -->
       <el-dialog title="URL管理" :visible.sync="dialogURLVisible">
-        <el-form :model="urlData" :rules="urlRules" ref="urlData" label-position="left" label-width="80px" style="width: 400px; margin-left:70px;">
+        <el-form :model="urlForm" :rules="urlRules" ref="urlForm" label-position="right" label-width="80px" style="padding:0px 20px">
+          <el-row>
+            <el-col :span="12">
                 <el-form-item label="URL名称" prop="name">
-                    <el-input v-model="urlData.name"/>
+                <el-input v-model="urlForm.name" placeholder="请输URL名称"/>
                 </el-form-item>
-                <el-form-item label="URL" prop="target">
-                    <el-input v-model="urlData.url"></el-input>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="URL" prop="url">
+                <el-input v-model="urlForm.url" placeholder="请输URL"/>
                 </el-form-item>
-                <!-- <el-form-item label="菜单图标" prop="icon">
-                    <el-switch v-model.number="urlData.auth" :value="urlData.auth" :active-value=1 :inactive-value=0 />
-                </el-form-item> -->
-            </el-form>
-            <div slot="footer">
-                <el-button @click="dialogURLVisible = false">取消</el-button>
-                <el-button type="primary" @click="saveMenu()">提交</el-button>
-            </div>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="12">
+                <el-form-item label="权限标识" prop="permission">
+                <el-input v-model="urlForm.permission" placeholder="请输授权编码"/>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="编码" prop="code">
+                <el-input name='code' v-model="urlForm.code" readonly :disabled="urlForm.code">
+                  <el-button v-if="!urlForm.code" slot="append" @click="getCode">获取编码</el-button>
+                </el-input>
+                </el-form-item>
+            </el-col>
+          </el-row>
+          
+          <el-row>
+            <el-col :span="12">
+                <el-form-item label="菜单权限" prop="menu" >
+                  <treeselect v-model="urlForm.menuId" 
+                  :options="menuOptions" 
+                  :normalizer="normalizer"
+                  :disable-branch-nodes="true"
+                  placeholder="选择归属菜单" />
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="角色" prop="role">
+                  <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择">
+                    <el-option v-for="item in optionsRole" :key="item.id" :label="item.name" :value="item.id"/>
+                  </el-select>
+                </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+        <div slot="footer">
+            <el-button @click="dialogURLVisible = false">取消</el-button>
+            <el-button type="primary" @click="saveMenu()">提交</el-button>
+        </div>
       </el-dialog>
     </div>
 </template>
 
 <script>
+import { getMenu } from "@/api/system/menu";
+import { getCode,save } from "@/api/system/url";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+
   export default {
+    components: { Treeselect },
     data() {
       return {
         tableData: [],
-        urlData: {},
+        urlForm: {},
         urlRules: {},
-        dialogURLVisible: false
+        // 菜单
+        menuOptions: [],
+        // 角色
+        optionsRole: [],
+        dialogURLVisible: false,
+        defaultProps: {
+          children: "children",
+          label: "name"
+        }
       }
     },
     created() {
         this.getUrlList()
+        this.getMenu()
+        this.getRole()
     },
     methods: {
+      normalizer(node){
+        if (node.children && !node.children.length) {
+          delete node.children;
+        }
+        return {
+          id: node.id,
+          label: node.name,
+          children: node.children
+        };
+      },
+      getRole(){
+        this.$ajax.get('sys/role/listAll').then((res) => {
+          if (res.code === 200) {
+            this.optionsRole = res.list
+          }
+        })
+      },
+      getMenu() {
+        getMenu().then((res) => {
+          if (res.code == 200) {
+            this.menuOptions = res.data
+          }
+        })
+      },
       getUrlList() {
         this.$ajax.get('sys/url/page').then((res) => {
             if (res.code === 200) {
@@ -86,8 +163,20 @@
       // 点击编辑按钮
       updateUrl(row){
         this.dialogURLVisible = true;
-        this.urlData = row;
+        this.urlForm = row;
 
+      },
+      getCode(){
+        getCode().then((res)=>{
+          this.$urlForm.code = res.msg
+          this.$notify.success('获取code成功')
+        });
+      },
+      saveMenu(){
+        console.log(this.urlForm)
+        save(this.urlForm).then(res => {
+          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+        })
       },
       // 删除 url
       deleteUrl(row){

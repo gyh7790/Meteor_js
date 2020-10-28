@@ -7,11 +7,13 @@ import Cookies from 'js-cookie'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
+import {msg,notify} from '@/utils/message'
 
 import './assets/icons'  // 引入 icon
 
 import './styles/element-variables.scss'
 import '@/styles/index.scss'
+import '@/styles/meteor.scss'
 
 Vue.use(ElementUI,{
   size: Cookies.get('size') || 'medium',
@@ -19,6 +21,8 @@ Vue.use(ElementUI,{
 });
 
 Vue.config.productionTip = false
+Vue.prototype.$notify = notify
+Vue.prototype.$msg = msg
 Vue.prototype.$ajax = ajax
 
 new Vue({
