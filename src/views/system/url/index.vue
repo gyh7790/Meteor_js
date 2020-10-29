@@ -1,9 +1,9 @@
 <template>
     <div class="app-container">
+
+
       <div class="filter-container">
-        <el-button type="primary" size="mini" >新增</el-button>
-        <el-button >查询</el-button>
-        <el-button >清除所有过滤器</el-button>
+        <el-button type="primary" size="mini" @click="addUrl">新增</el-button>
       </div>
       
       <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all >
@@ -56,8 +56,8 @@
             </el-col>
             <el-col :span="12">
                 <el-form-item label="编码" prop="code">
-                <el-input name='code' v-model="urlForm.code" readonly :disabled="urlForm.code">
-                  <el-button v-if="!urlForm.code" slot="append" @click="getCode">获取编码</el-button>
+                <el-input name='code' v-model="urlForm.code" readonly :disabled="!urlFormCode">
+                  <el-button v-if="urlFormCode" slot="append" @click="getCode">获取编码</el-button>
                 </el-input>
                 </el-form-item>
             </el-col>
@@ -76,15 +76,18 @@
             <el-col :span="12">
                 <el-form-item label="角色" prop="role">
                   <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择">
-                    <el-option v-for="item in optionsRole" :key="item.id" :label="item.name" :value="item.id"/>
+                    <el-option v-for="item in optUrlRole" :key="item.id" :label="item.name" :value="item.id"/>
                   </el-select>
                 </el-form-item>
             </el-col>
           </el-row>
+          <el-form-item label="备注" prop="remarks">
+            <el-input v-model="urlForm.remarks" type="textarea" placeholder="请输入内容"></el-input>
+          </el-form-item>
         </el-form>
         <div slot="footer">
             <el-button @click="dialogURLVisible = false">取消</el-button>
-            <el-button type="primary" @click="saveMenu()">提交</el-button>
+            <el-button type="primary" @click="saveUrl()">提交</el-button>
         </div>
       </el-dialog>
     </div>
@@ -106,7 +109,9 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         // 菜单
         menuOptions: [],
         // 角色
-        optionsRole: [],
+        optUrlRole: [],
+        // 
+        urlFormCode: true,
         dialogURLVisible: false,
         defaultProps: {
           children: "children",
@@ -133,7 +138,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
       getRole(){
         this.$ajax.get('sys/role/listAll').then((res) => {
           if (res.code === 200) {
-            this.optionsRole = res.list
+            this.optUrlRole = res.list
           }
         })
       },
@@ -160,28 +165,35 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
           }
         })
       },
+      // 点击新增
+      addUrl(){
+        this.urlForm = {code:''}
+        this.urlFormCode = true;
+        this.dialogURLVisible = true;
+      },
       // 点击编辑按钮
       updateUrl(row){
+        this.urlFormCode = false;
         this.dialogURLVisible = true;
         this.urlForm = row;
-
       },
       getCode(){
         getCode().then((res)=>{
-          this.$urlForm.code = res.msg
+          this.urlForm.code = res.msg
           this.$notify.success('获取code成功')
         });
       },
-      saveMenu(){
-        console.log(this.urlForm)
+      saveUrl(){
         save(this.urlForm).then(res => {
-          this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          this.$msg.success(res.msg);
+          this.dialogURLVisible = false;
         })
       },
       // 删除 url
       deleteUrl(row){
         this.$ajax.delete('sys/url/'+row.id).then(res => {
           this.$message({ message: res.msg, type: res.code === 200 ? 'success' : 'error'});
+          this.dialogURLVisible = false;
         });
       }
     }

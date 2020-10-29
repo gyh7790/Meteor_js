@@ -199,6 +199,7 @@
             this.loginNameDis=true
             this.dialogFormVisible = true
             this.dataForm = row
+            this.dataForm.roles = row.roleIds
         },
         submitForm(){
             this.$refs["dataForm"].validate(valid => {
