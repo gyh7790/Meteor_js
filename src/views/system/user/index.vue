@@ -204,7 +204,6 @@
         submitForm(){
             this.$refs["dataForm"].validate(valid => {
                 if (valid) {
-                    console.log(this.dataForm)
                     this.$ajax.post('sys/user/save',this.dataForm).then((res)=>{
                         this.$message({
                             message: res.msg,

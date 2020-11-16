@@ -1,6 +1,19 @@
 <template>
     <div class="app-container">
 
+      <div class="filter-container">
+        <el-form :model="queryParams" ref="queryParams" :inline="true">
+            <el-form-item label="关键字">
+              <el-input v-model="queryParams.keyWord" placeholder="名称、接口"></el-input>
+            </el-form-item>
+            <el-form-item label="接口类型" prop="queryParams">
+              <dict-list v-model="queryParams.type" dictType="url_type"/>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-search" size="mini" @click="getUrlList">搜索</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
 
       <div class="filter-container">
         <el-button type="primary" size="mini" @click="addUrl">新增</el-button>
@@ -9,18 +22,19 @@
       <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all >
         <el-table-column prop="name" label="名称"/>
         <el-table-column prop="url" label="接口"/>
-        <el-table-column prop="type" label="类型"/>
+        <el-table-column prop="type" label="类型">
+          <template slot-scope="{row}">
+            <dict-item dictType="url_type" :dictValue="row.type + ''" /> 
+          </template>
+        </el-table-column>
         <el-table-column prop="menuName" label="接口页面"/>
         <el-table-column prop="auth" label="权限校验" width="80" >
           <template slot-scope="{row}">
-            <el-switch v-model.number="row.auth" @change="changeSwitch(row)" :value="row.auth" :active-value=1 :inactive-value=0 />
+            <el-switch v-model.number="row.auth" :value="row.auth" :active-value=1 :inactive-value=0 disabled/>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <el-button v-if="row.auth == 1" size="mini" type="success">
-                配置权限
-              </el-button>
               <el-button size="mini" @click="updateUrl(row)" type="warning">
                   编辑
               </el-button>
@@ -65,7 +79,7 @@
           
           <el-row>
             <el-col :span="12">
-                <el-form-item label="菜单权限" prop="menu" >
+              <el-form-item label="菜单权限" prop="menu" >
                   <treeselect v-model="urlForm.menuId" 
                   :options="menuOptions" 
                   :normalizer="normalizer"
@@ -74,16 +88,35 @@
                 </el-form-item>
             </el-col>
             <el-col :span="12">
-                <el-form-item label="角色" prop="role">
-                  <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择">
-                    <el-option v-for="item in optUrlRole" :key="item.id" :label="item.name" :value="item.id"/>
-                  </el-select>
+              <el-row>
+                <el-col :span="6">
+                  <el-form-item label="权限" prop="type">
+                    <el-switch v-model.number="urlForm.auth" :value="urlForm.auth" :active-value=1 :inactive-value=0 />
+                  </el-form-item> 
+                </el-col>
+                <el-col :span="18">
+                  <el-form-item label="角色" prop="role">
+                    <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择" :disabled="urlForm.auth == 0">
+                      <el-option v-for="item in optUrlRole" :key="item.id" :label="item.name" :value="item.id"/>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="12">
+              <el-form-item label="类型" prop="type">
+                <dict-list :selected="urlForm.type" @select="selectType" dictType="url_type"/>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="备注" prop="remarks">
+                  <el-input v-model="urlForm.remarks" type="textarea" placeholder="请输入内容"></el-input>
                 </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="备注" prop="remarks">
-            <el-input v-model="urlForm.remarks" type="textarea" placeholder="请输入内容"></el-input>
-          </el-form-item>
         </el-form>
         <div slot="footer">
             <el-button @click="dialogURLVisible = false">取消</el-button>
@@ -95,14 +128,17 @@
 
 <script>
 import { getMenu } from "@/api/system/menu";
-import { getCode,save } from "@/api/system/url";
+import url from "@/api/system/url";
 import Treeselect from "@riophae/vue-treeselect";
+import DictList from "@/components/DictList"
+import DictItem from "@/components/DictItem"
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
   export default {
-    components: { Treeselect },
+    components: { Treeselect,DictList,DictItem},
     data() {
       return {
+        queryParams: {},
         tableData: [],
         urlForm: {},
         urlRules: {},
@@ -123,6 +159,7 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         this.getUrlList()
         this.getMenu()
         this.getRole()
+        // this.dictFetch('url_type')
     },
     methods: {
       normalizer(node){
@@ -150,11 +187,17 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         })
       },
       getUrlList() {
-        this.$ajax.get('sys/url/page').then((res) => {
+        console.log(this.queryParams)
+        url.getPage(this.queryParams).then((res) => {
             if (res.code === 200) {
                 this.tableData = res.page.list
             }
         })
+        // this.$ajax.get('sys/url/page').then((res) => {
+        //     if (res.code === 200) {
+        //         this.tableData = res.page.list
+        //     }
+        // })
       },
       // 更改 权限 校验
       changeSwitch(row){
@@ -165,9 +208,12 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
           }
         })
       },
+      selectType(val){
+        this.urlForm.type = val
+      },
       // 点击新增
       addUrl(){
-        this.urlForm = {code:''}
+        this.urlForm = {code:'',auth: '0',type: '1'}
         this.urlFormCode = true;
         this.dialogURLVisible = true;
       },
@@ -178,13 +224,13 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         this.urlForm = row;
       },
       getCode(){
-        getCode().then((res)=>{
+        url.getCode().then((res)=>{
           this.urlForm.code = res.msg
           this.$notify.success('获取code成功')
         });
       },
       saveUrl(){
-        save(this.urlForm).then(res => {
+        url.save(this.urlForm).then(res => {
           this.$msg.success(res.msg);
           this.dialogURLVisible = false;
         })

@@ -121,7 +121,6 @@ export default {
       }
     };
     const validateCode = (rule, value, callback) => {
-      console.log(value)
       if (value != '' && value.length != 6) {
         callback(new Error('请输入六位验证码'))
       } else {

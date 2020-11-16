@@ -1,64 +1,72 @@
 <template>
-    <el-select v-model="value" @change="handleSelectChange" filterable placeholder="请选择">
-      <el-option
-      v-for="item in dictDatas"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value">
-      <span style="float: left">{{ item.label }}</span>
-      <span v-if="isValue" style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
-    </el-option>
-  </el-select>
+ <el-tag
+    v-bind="$attrs"
+    :hit='true'
+    effect="dark">
+    {{ dictLabel +'-'+ getDictLabel11}}
+  </el-tag>
 </template>
 
+
 <script>
+  import {mapState, mapActions } from 'vuex'
+
   export default {
-    name: 'DictItem',
+    name: 'DictList',
     props: {
-      dictData: {
-        type: Array
-      },
       dictType: {
         type: String,
         required: true
       },
-      isValue: {
-        type: Boolean,
-        default: false
+      dictValue: {
+        type: String,
+        required: true
       }
     },
-    // computed: {
-    //   dictDatas: {
-    //     get() {
-    //       return this.dictData
-    //     },
-    //     set(val) {
-    //       this.$emit('update:dictData', val)
-    //     }
-    //   }
-    // },
     data() {
       return {
-        dictDatas: this.dictData,
-        value: ''
+        dictLabel: ''
       }
     },
-    created() {
-      if (!this.dictDatas) {
-        this.getDictList();
-      }
+    computed: {
+      getDictLabel11 () {
+        const dictDataList = this.dictData['url_type']
+        console.log("---------->", dictDataList)
+        if (dictDataList && dictDataList.value && dictDataList.value.length > 0) {
+            const dict = Array.from(this.dictData.value).find(e =>e.value == this.dictValue)
+             console.log('dict')
+            console.log(dict)
+            return dict.label || ''
+        }
+        return ''
+      },
+      ...mapState('dict', [
+        'dictData'
+      ])
+    },
+    watch: {
+      getDictLabel11: 'setDictList'
+    },
+    async created() {
+      await this.fetch(this.dictType)
+      await this.getDictDataLabel()
     },
     methods: {
-      getDictList() {
-        this.$ajax.get('sys/dictData/'+this.dictType).then((res) => {
-          if (res.code === 200) {
-            this.dictDatas = res.list;
-          }
+      async setDictList() {
+        await Promise.resolve(this.fetch(this.dictType)).then((res)=>{
+          console.log('==44444444444=>',res)
+          this.getDictDataLabel()
         })
       },
-      handleSelectChange(val) {
-        this.$emit('select', val)
-      }
+      async getDictDataLabel(){
+        await this.getDictLabel({dictType:this.dictType,dictValue: this.dictValue});
+        console.log('==888888888888888=>')
+      },
+      ...mapActions('dict', {
+        fetch: 'fetch',
+        getDictLabel: 'getDictLabel'
+      }),
+
     }
   }
 </script>

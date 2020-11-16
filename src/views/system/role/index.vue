@@ -178,8 +178,6 @@ import { setEmpower } from "@/api/system/role";
       let checkedKeys = this.$refs.menu.getHalfCheckedKeys();
       // 半选中的菜单节点
       let halfCheckedKeys = this.$refs.menu.getCheckedKeys();
-      console.log(this.roleId)
-      console.log([...checkedKeys,...halfCheckedKeys]);
         setEmpower({id:this.roleId,menuIds:[...checkedKeys,...halfCheckedKeys]}).then((res)=>{
            this.$message({
             message: res.msg,
