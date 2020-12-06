@@ -14,5 +14,19 @@ html, body {
       a {
         text-decoration: none;
       }
+      .components-container {
+        margin: 10px 15px;
+        position: relative;
+        height: 100vh;
+      }
+
+      .height-all {
+        height: 100%;
+      }
+
+      .el-card {
+        height: 100%;
+      }
+
     }
 }

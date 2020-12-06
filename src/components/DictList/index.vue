@@ -1,5 +1,5 @@
 <template>
-    <el-select v-model="value" @change="handleSelectChange" filterable placeholder="请选择">
+    <el-select v-model="selectedStr" @change="handleSelectChange" filterable placeholder="请选择" v-bind="$attrs">
       <el-option
       v-for="item in dictDatas"
       :key="item.value"
@@ -20,7 +20,7 @@
         type: Array
       },
       selected: {
-        type: Object
+        type: [Number,String]
       },
       dictType: {
         type: String,

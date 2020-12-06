@@ -1,5 +1,7 @@
 <template>
-    <div>字典</div>
+    <dev>
+        
+    </dev>
 </template>
 
 <script>

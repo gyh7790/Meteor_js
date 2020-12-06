@@ -7,7 +7,7 @@
               <el-input v-model="queryParams.keyWord" placeholder="名称、接口"></el-input>
             </el-form-item>
             <el-form-item label="接口类型" prop="queryParams">
-              <dict-list v-model="queryParams.type" dictType="url_type"/>
+              <dict-list v-model="queryParams.type" dictType="url_type" :handleSelectChange="queryParams.type" clearable />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" icon="el-icon-search" size="mini" @click="getUrlList">搜索</el-button>
@@ -45,6 +45,8 @@
         </el-table-column>
       </el-table>
 
+      <!-- 分页 -->
+      <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getUrlList"/>
 
       <!-- 菜单 的URL管理 -->
       <el-dialog title="URL管理" :visible.sync="dialogURLVisible">
@@ -63,18 +65,23 @@
           </el-row>
 
           <el-row>
-            <el-col :span="12">
+            <!-- <el-col :span="12">
                 <el-form-item label="权限标识" prop="permission">
                 <el-input v-model="urlForm.permission" placeholder="请输授权编码"/>
                 </el-form-item>
-            </el-col>
+            </el-col> -->
             <el-col :span="12">
-                <el-form-item label="编码" prop="code">
+                <el-form-item label="接口编码" prop="code">
                 <el-input name='code' v-model="urlForm.code" readonly :disabled="!urlFormCode">
                   <el-button v-if="urlFormCode" slot="append" @click="getCode">获取编码</el-button>
                 </el-input>
                 </el-form-item>
             </el-col>
+            <el-col :span="12">
+                <el-form-item label="权限" prop="type">
+                  <el-switch v-model.number="urlForm.auth" :value="urlForm.auth" :active-value=1 :inactive-value=0 />
+                </el-form-item> 
+              </el-col>
           </el-row>
           
           <el-row>
@@ -88,20 +95,11 @@
                 </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-row>
-                <el-col :span="6">
-                  <el-form-item label="权限" prop="type">
-                    <el-switch v-model.number="urlForm.auth" :value="urlForm.auth" :active-value=1 :inactive-value=0 />
-                  </el-form-item> 
-                </el-col>
-                <el-col :span="18">
-                  <el-form-item label="角色" prop="role">
-                    <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择" :disabled="urlForm.auth == 0">
-                      <el-option v-for="item in optUrlRole" :key="item.id" :label="item.name" :value="item.id"/>
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-row>
+              <el-form-item label="角色" prop="role">
+                <el-select v-model="urlForm.roles" multiple filterable clearable placeholder="请选择" :disabled="urlForm.auth == 0">
+                  <el-option v-for="item in optUrlRole" :key="item.id" :label="item.name" :value="item.id"/>
+                </el-select>
+              </el-form-item>
             </el-col>
           </el-row>
 
@@ -128,6 +126,7 @@
 
 <script>
 import { getMenu } from "@/api/system/menu";
+import Pagination from '@/components/Pagination'
 import url from "@/api/system/url";
 import Treeselect from "@riophae/vue-treeselect";
 import DictList from "@/components/DictList"
@@ -135,10 +134,14 @@ import DictItem from "@/components/DictItem"
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
   export default {
-    components: { Treeselect,DictList,DictItem},
+    components: { Pagination,Treeselect,DictList,DictItem},
     data() {
       return {
-        queryParams: {},
+        queryParams: {
+          pageNo: 1,
+          pageSize: 10,
+        },
+        total: 0,
         tableData: [],
         urlForm: {},
         urlRules: {},
@@ -160,6 +163,11 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         this.getMenu()
         this.getRole()
         // this.dictFetch('url_type')
+    },
+    watch: {
+      'queryParams.keyWord': function () {
+        console.log('queryParams --- > 有变动')
+      }
     },
     methods: {
       normalizer(node){
@@ -187,10 +195,10 @@ import "@riophae/vue-treeselect/dist/vue-treeselect.css";
         })
       },
       getUrlList() {
-        console.log(this.queryParams)
         url.getPage(this.queryParams).then((res) => {
             if (res.code === 200) {
-                this.tableData = res.page.list
+              this.total = res.page.total;
+              this.tableData = res.page.list
             }
         })
         // this.$ajax.get('sys/url/page').then((res) => {

@@ -24,6 +24,8 @@ import { getRouter } from '@/api/navList'
 import Logo from './Logo'
 import SidebarItem from './SidebarItem'
 import variables from '@/styles/variables.scss'
+import router from '@/router'
+import mainRouter from '@/router/mainRouter'
 
 export default {
   components: { SidebarItem, Logo },
@@ -58,9 +60,22 @@ export default {
   mounted () {
     if (Array.from(this.permission_routes).length <= 0 ) {
       this.$ajax.get('sys/menu/getNav').then((res) => {
+
+      mainRouter.children.push(...[{
+                path: '/sys-dev/url',
+                name: 'sysDevUrl-AAAAAAAAAAA',
+                // meta: {title: '接口调试'},
+                component: () => import('@/views/sys-dev/url/index.vue')
+            }])
+        router.addRoutes([{
+          path: '/sys-dev/gen-code',
+          name: 'sysDevGenCode',
+          // meta: {title: '代码生成'},
+          component: () => import('@/views/sys-dev/url/index.vue')
+      }])
+        this.router = router
+        console.log("router.addRoutes", this.router)
         this.$store.dispatch('permission/setRoutes',getRouter(res.list));
-        // this.$router.push({ path: '/home' })
-        // this.$store.dispatch('tagsView/delAllViews')
       })
     }
   },

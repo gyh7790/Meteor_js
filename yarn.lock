@@ -2589,6 +2589,11 @@ core-js@^3.6.5:
   resolved "https://registry.npm.taobao.org/core-js/download/core-js-3.6.5.tgz#7395dc273af37fb2e50e9bd3d9fe841285231d1a"
   integrity sha1-c5XcJzrzf7LlDpvT2f6EEoUjHRo=
 
+core-js@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.npm.taobao.org/core-js/download/core-js-3.8.1.tgz?cache=0&sync_timestamp=1607215985521&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcore-js%2Fdownload%2Fcore-js-3.8.1.tgz#f51523668ac8a294d1285c3b9db44025fda66d47"
+  integrity sha1-9RUjZorIopTRKFw7nbRAJf2mbUc=
+
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.npm.taobao.org/core-util-is/download/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -7810,6 +7815,11 @@ split-string@^3.0.1, split-string@^3.0.2:
   integrity sha1-fLCd2jqGWFcFxks5pkZgOGguj+I=
   dependencies:
     extend-shallow "^3.0.0"
+
+splitpanes@^2.3.6:
+  version "2.3.6"
+  resolved "https://registry.npm.taobao.org/splitpanes/download/splitpanes-2.3.6.tgz#de0f7294c56b8b18be0f97b974de9cff96c431df"
+  integrity sha1-3g9ylMVrixi+D5e5dN6c/5bEMd8=
 
 sprintf-js@~1.0.2:
   version "1.0.3"

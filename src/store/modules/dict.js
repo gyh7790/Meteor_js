@@ -18,6 +18,7 @@ const state = {
 
 const mutations = {
     setDict(state, data){
+        state.dictData = {}
         for(let key in data){
             state.dictData[key] = data[key]
         }
