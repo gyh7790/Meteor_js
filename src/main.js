@@ -8,6 +8,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 import {msg,notify} from '@/utils/message'
+import jsoneditor from 'jsoneditor'
 
 import './assets/icons'  // 引入 icon
 
@@ -20,7 +21,9 @@ Vue.use(ElementUI,{
   locale: zhLocale
 });
 
+
 Vue.config.productionTip = false
+Vue.prototype.$jsoneditor = jsoneditor
 Vue.prototype.$notify = notify
 Vue.prototype.$msg = msg
 Vue.prototype.$ajax = ajax

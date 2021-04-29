@@ -48,10 +48,10 @@
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" :close-on-click-modal='true' append-to-body>
       <el-form ref="dictTypeForm" :model="dictTypeForm" :rules="dictTypeRules" label-width="80px">
-        <el-form-item label="数据标签" prop="name">
+        <el-form-item label="字典名称" prop="name">
           <el-input v-model="dictTypeForm.name" placeholder="请输入数据标签" />
         </el-form-item>
-        <el-form-item label="数据键值" prop="type">
+        <el-form-item label="字典类型" prop="type">
           <el-input v-model="dictTypeForm.type" placeholder="请输入数据键值" />
         </el-form-item>
         <el-form-item label="备注" prop="remarks">
@@ -98,8 +98,8 @@ import Pagination from '@/components/Pagination'
       getDictTypeList(){
         this.$ajax.get('sys/dictType/page',this.params).then((res) => {
           if (res.code === 200) {
-              this.total = res.page.total;
-              this.tableData = res.page.list
+              this.total = res.data.total;
+              this.tableData = res.data.list
           }
         })
       },

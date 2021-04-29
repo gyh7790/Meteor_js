@@ -154,7 +154,8 @@ export default {
             url: 'login',
             params: {
               username: this.loginForm.username,
-              password: this.loginForm.password
+              password: this.loginForm.password,
+              device: 'pc'
             }
           }).then((res) => {
             if (res.code === 200) {

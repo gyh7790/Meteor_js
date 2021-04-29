@@ -7,6 +7,7 @@ import { getToken } from './auth'
 axios.defaults.baseURL=process.env.VUE_APP_URL
 // axios.defaults.withCredentials = true
 axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
+axios.defaults.headers['version'] = process.env.VUE_APP_VERSIONS
 // axios.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
 
 let axiosObj = axios.create({
@@ -38,6 +39,8 @@ axiosObj.interceptors.response.use(res => {
     // 还未登入  跳转到登入界面
     Message.error(res.data.msg)
     this.router.push({ name: 'main' })
+  } else if (typeof(res.data) == 'string') {
+    return Promise.reject(res.data)
   } else {
     Message.error(res.data.msg)
     return Promise.reject(res.data)

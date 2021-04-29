@@ -136,7 +136,7 @@ import { setEmpower } from "@/api/system/role";
       getRoleList(){
         this.$ajax.get('sys/role/page',this.queryParams).then((res) => {
           if (res.code === 200) {
-              this.tableData = res.page.list
+              this.tableData = res.data.list
           }
         })
       },

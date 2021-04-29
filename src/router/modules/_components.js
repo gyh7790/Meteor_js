@@ -3,27 +3,27 @@
  * **/
 export default [
     {
-        path: '/modular/json',
-        name: 'modularJson',
+        path: '/modules/json',
+        name: 'modulesJson',
         meta: {title: 'Json'},
-        component: () => import('@/views/modular/json.vue')
+        component: () => import('@/views/modules/json.vue')
     },
     {
-        path: '/modular/icon',
-        name: 'modularIcon',
+        path: '/modules/icon',
+        name: 'modulesIcon',
         meta: {title: '图标'},
-        component: () => import('@/views/modular/icons/index.vue')
+        component: () => import('@/views/modules/icons/index.vue')
     },
     {
-        path: '/modular/dnd',
-        name: 'modularJson',
+        path: '/modules/dnd',
+        name: 'modulesJson',
         meta: {title: 'DND'},
-        component: () => import('@/views/modular/dndList.vue')
+        component: () => import('@/views/modules/dndList.vue')
     },
     {
         path: '/AAA/BBB',
-        name: 'modularJson',
+        name: 'modulesJson',
         meta: {title: 'DND'},
-        component: () => import('@/views/modular/dndList.vue')
+        component: () => import('@/views/modules/dndList.vue')
     },
 ]

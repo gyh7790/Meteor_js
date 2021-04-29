@@ -1,5 +1,6 @@
 import system from './modules/_system'
 import home from './modules/_index'
+import app from './modules/_app'
 import sysDev from './modules/_sys-dev'
 import modular from './modules/_components'
 
@@ -10,6 +11,7 @@ const mainRouter = {
     children: [
         ...home,
         ...modular,
+        ...app,
         ...system,
         ...sysDev
     ]

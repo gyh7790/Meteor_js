@@ -180,7 +180,7 @@
         getUserList(){
             this.$ajax.get('sys/user/page',this.queryParams).then((res) => {
                 if (res.code === 200) {
-                    this.tableData = res.page.list
+                    this.tableData = res.data.list
                 }
             })
         },

@@ -17,39 +17,34 @@
     props: {
       value: { type: String, default: '', required: false },
       dictData: {
-        type: Array
+        type: Array,
+        required: false
       },
       selected: {
-        type: [Number,String]
+        type: [Number,String],
+        required: false
       },
       dictType: {
-        type: String,
-        required: true
+        type: [Number,String],
+        required: false
       },
       isValue: {
         type: Boolean,
         default: false
       }
     },
-    // computed: {
-    //   dictDatas: {
-    //     get() {
-    //       return this.dictData
-    //     },
-    //     set(val) {
-    //       this.$emit('update:dictData', val)
-    //     }
-    //   }
-    // },
     data() {
       return {
         selectedStr: String(this.selected || ''),
-        dictDatas: this.dictData
+        dictDatas: {}
       }
     },
     created() {
-      if (!this.dictDatas) {
+      console.log('------------>',this.dictData)
+      if (!this.dictData) {
         this.getDictList();
+      } else {
+        this.dictDatas = this.dictData
       }
     },
     methods: {

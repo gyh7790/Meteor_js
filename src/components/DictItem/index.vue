@@ -14,12 +14,16 @@
   export default {
     name: 'DictItem',
     props: {
+      dataList: {
+        type: Array,
+        required: false
+      },
       dictType: {
         type: String,
-        required: true
+        required: false
       },
       dictValue: {
-        type: String,
+        type: [Number,String],
         required: true
       }
     },
@@ -31,10 +35,16 @@
     computed: {
       dictLabel: function () {
         let dictLabel = ''
-        const dictDataList = this.dictData[this.dictType]
-        if (dictDataList && dictDataList.length > 0) {
-            const dict = Array.from(dictDataList).find(e =>e.value == this.dictValue)
+        if (this.dataList && this.dataList.length > 0) {
+            const dict = Array.from(this.dataList).find(e =>e.value == this.dictValue)
             dictLabel = dict ? dict.label || '' : ''
+        }
+        if (this.dictType) {
+          const dictDataList = this.dictData[this.dictType]
+          if (dictDataList && dictDataList.length > 0) {
+              const dict = Array.from(dictDataList).find(e =>e.value == this.dictValue)
+              dictLabel = dict ? dict.label || '' : ''
+          }
         }
         return dictLabel
       },

@@ -14,39 +14,35 @@
             </el-form-item>
         </el-form>
     </div>
-
-      <div class="filter-container">
-        <el-button type="primary" size="mini" @click="addUrl">新增</el-button>
-      </div>
       
-      <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all >
-        <el-table-column prop="name" label="名称"/>
-        <el-table-column prop="url" label="接口"/>
-        <el-table-column prop="type" label="类型">
-          <template slot-scope="{row}">
-            <dict-item dictType="url_type" :dictValue="row.type + ''" /> 
-          </template>
-        </el-table-column>
-        <el-table-column prop="menuName" label="接口页面"/>
-        <el-table-column prop="auth" label="权限校验" width="80" >
-          <template slot-scope="{row}">
-            <el-switch v-model.number="row.auth" :value="row.auth" :active-value=1 :inactive-value=0 disabled/>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
-            <template slot-scope="{row}">
-              <el-button size="mini" @click="updateUrl(row)" type="warning">
-                  编辑
-              </el-button>
-              <el-button size="mini" @click="deleteUrl(row)" type="danger">
-                  删除
-              </el-button>
-            </template>
-        </el-table-column>
-      </el-table>
+    <el-table :data="tableData" style="width: 100%;" row-key="id" stripe border default-expand-all >
+    <el-table-column prop="name" label="名称"/>
+    <el-table-column prop="url" label="接口"/>
+    <el-table-column prop="type" label="类型">
+        <template slot-scope="{row}">
+        <dict-item dictType="url_type" :dictValue="row.type + ''" /> 
+        </template>
+    </el-table-column>
+    <el-table-column prop="menuName" label="接口页面"/>
+    <el-table-column prop="auth" label="权限校验" width="80" >
+        <template slot-scope="{row}">
+        <el-switch v-model.number="row.auth" :value="row.auth" :active-value=1 :inactive-value=0 disabled/>
+        </template>
+    </el-table-column>
+    <el-table-column label="操作" align="center" width="230" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+            <el-button size="mini" @click="updateUrl(row)" type="warning">
+                编辑
+            </el-button>
+            <el-button size="mini" @click="deleteUrl(row)" type="danger">
+                删除
+            </el-button>
+        </template>
+    </el-table-column>
+    </el-table>
 
-      <!-- 分页 -->
-      <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getUrlList"/>
+    <!-- 分页 -->
+    <pagination v-show="total>0" :total="total" :page.sync="queryParams.pageNo" :limit.sync="queryParams.pageSize" @pagination="getUrlList"/>
 
       <!-- 菜单 的URL管理 -->
       <el-dialog title="URL管理" :visible.sync="dialogURLVisible">

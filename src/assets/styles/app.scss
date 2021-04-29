@@ -28,5 +28,22 @@ html, body {
         height: 100%;
       }
 
+      .el-divider--horizontal {
+        display: block;
+        height: 1px;
+        width: 100%;
+        margin: 10px 0;
+      }
+
+      .el-li {
+        margin: 5px 0;
+        border: 1px solid #C0C4CC;
+        border-radius: 5px;
+        padding: 2px 5px;
+      }
+
+      .el-card__body {
+        padding: 10px;
+      }
     }
 }
