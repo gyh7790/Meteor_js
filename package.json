@@ -16,7 +16,7 @@
     "element-ui": "^2.13.2",
     "fuse.js": "^6.2.0",
     "js-cookie": "^2.2.1",
-    "jsoneditor": "^9.1.6",
+    "jsoneditor": "^9.5.6",
     "jsonlint": "^1.6.3",
     "lodash": "^4.17.20",
     "node-sass": "^4.14.1",
